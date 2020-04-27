@@ -467,7 +467,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 
         if self.augment:
             # random left-right flip
-            lr_flip = True
+            lr_flip = False
             if lr_flip and random.random() < 0.5:
                 img = np.fliplr(img)
                 if nL:
