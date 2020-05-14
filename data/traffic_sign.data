@@ -1,0 +1,4 @@
+classes=33
+train=swedish_traffic_sign/train_traffic_sign.txt
+valid=swedish_traffic_sign/test_traffic_sign.txt
+names=data/traffic_sign.names
