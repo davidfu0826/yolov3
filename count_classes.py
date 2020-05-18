@@ -51,10 +51,9 @@ def two_stacked_horizontal_histogram(
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--source', type=str, default='data/samples', help='path to image directory')  # input file/folder, 0 for webcam
-    parser.add_argument('--annot', type=str, help='path to annotations')
-    #parser.add_argument('--save-txt', action='store_true', help='save results to *.txt')
-    parser.add_argument('--names', type=str, default='data/coco.names', help='*.names path')
+    parser.add_argument('--output', type=str, default='output', help='path to output directory (created from detect.py --save-txt)')  
+    parser.add_argument('--annot', type=str, help='path to annotation files directory (Darknet format)')
+    parser.add_argument('--names', type=str, default='data/traffic_sign.names', help='*.names path')
     opt = parser.parse_args()
     
     path_to_folder = opt.source
