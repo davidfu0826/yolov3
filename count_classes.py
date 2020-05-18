@@ -50,9 +50,9 @@ def two_stacked_horizontal_histogram(
     plt.show()
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--output', type=str, default='output', help='path to output directory (created from detect.py --save-txt)')  
-    parser.add_argument('--annot', type=str, help='path to annotation files directory (Darknet format)')
+    parser = argparse.ArgumentParser(description="Example usage: python count_classes.py --annot darknet_dataset\labels\")
+    parser.add_argument('--source', type=str, default='output', help='path to output directory (created from detect.py --save-txt)')  
+    parser.add_argument('--annot', type=str, help='path to annotation files directory (Darknet format)', required=True)
     parser.add_argument('--names', type=str, default='data/traffic_sign.names', help='*.names path')
     opt = parser.parse_args()
     
