@@ -87,13 +87,13 @@ if __name__ == '__main__':
             for label_id in labels:
                 label_list.append(idx_to_name[int(label_id)])
     #label_list += predictions
-    false_positives = list()
+    #false_positives = list()
     for pred in predictions:
-        try:
-            label_list.remove(pred)
-        except:
-            predictions.remove(pred)
-            false_positives.append(pred)
+        #try:
+        label_list.remove(pred)
+        #except:
+        #    predictions.remove(pred)
+        #    false_positives.append(pred)
     
     
     two_stacked_horizontal_histogram(predictions, label_list)      
