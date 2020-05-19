@@ -69,7 +69,7 @@ if __name__ == '__main__':
     #predictions = list()
     with open(path_tp) as f:
         lines = f.readlines()
-        tps = [int(line.replace("\n", "")) for line in lines]
+        tps = [int(float(line.replace("\n", ""))) for line in lines]
         predictions = [idx_to_name[tp] for tp in tps]
     #for txt_file in txt_files:
     #    with open(txt_file) as f:
