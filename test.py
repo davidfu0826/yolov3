@@ -7,7 +7,28 @@ from models import *
 from utils.datasets import *
 from utils.utils import *
 
+def save_true_positives(tp, conf, pred_cls, target_cls):
+    """ Saves true positives. 
+    # Arguments
+        tp:    True positives (nparray, nx1 or nx10).
+        conf:  Objectness value from 0-1 (nparray).
+        pred_cls: Predicted object classes (nparray).
+        target_cls: True object classes (nparray).
+    """
 
+    # Sort by objectness
+    i = np.argsort(-conf)
+    tp, conf, pred_cls = tp[i], conf[i], pred_cls[i]
+
+    true_positives = list()
+    for i in range(len(tp)):
+        if tp[i] and conf[i] > 0.001:
+            true_positives += [pred_cls[i]]
+    
+    with open("true_positives.txt", "w") as f:
+        for true_positive in true_positives:
+            f.write(f"{true_positive}\n")
+            
 def test(cfg,
          data,
          weights=None,
@@ -169,6 +190,8 @@ def test(cfg,
 
     # Compute statistics
     stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
+    save_true_positives(*stats)
+    
     if len(stats):
         p, r, ap, f1, ap_class = ap_per_class(*stats)
         if niou > 1:
@@ -183,9 +206,19 @@ def test(cfg,
     print(pf % ('all', seen, nt.sum(), mp, mr, map, mf1))
 
     # Print results per class
-    if verbose and nc > 1 and len(stats):
-        for i, c in enumerate(ap_class):
-            print(pf % (names[c], seen, nt[c], p[i], r[i], ap[i], f1[i]))
+    with open("test_results.txt", "w") as f:
+        f.write(f"{'all'} {seen} {nt.sum()} {mp} {mr} {map} {mf1}\n")
+        if verbose and nc > 1 and len(stats):
+            for i, c in enumerate(ap_class):
+                f.write(f"{names[c]} {seen} {nt[c]} {p[i][0]} {r[i][0]} {ap[i][0]} {f1[i][0]}\n")
+                print(pf % (names[c], seen, nt[c], p[i], r[i], ap[i], f1[i]))
+    
+    with open("formatted_test_results.txt", "w") as f:
+        f.write(s + "\n")
+        f.write(pf % ('all', seen, nt.sum(), mp, mr, map, mf1) + "\n")
+        if verbose and nc > 1 and len(stats):
+            for i, c in enumerate(ap_class):
+                f.write(pf % (names[c], seen, nt[c], p[i], r[i], ap[i], f1[i]) + "\n")
 
     # Print speeds
     if verbose or save_json:

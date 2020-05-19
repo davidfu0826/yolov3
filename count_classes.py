@@ -51,14 +51,14 @@ def two_stacked_horizontal_histogram(
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Example usage: python count_classes.py --annot darknet_dataset\labels\ ")
-    parser.add_argument('--source', type=str, default='output', help='path to output directory (created from detect.py --save-txt)')  
+    parser.add_argument('--true-positives', type=str, default='true_positives.txt', help='path to output file true_positives.txt (created from detect.py --save-txt)')  
     parser.add_argument('--annot', type=str, help='path to annotation files directory (Darknet format)', required=True)
     parser.add_argument('--names', type=str, default='data/traffic_sign.names', help='*.names path')
     opt = parser.parse_args()
     
-    path_to_folder = opt.source
+    path_tp = opt.true_positives
     names = opt.names
-    txt_files = glob.glob(path_to_folder + "/*.txt")
+    #txt_files = glob.glob(path_to_folder + "/*.txt")
     #print(txt_files)
     
     idx_to_name = dict()
@@ -66,14 +66,18 @@ if __name__ == '__main__':
         for i, line in enumerate(f.readlines()):
             idx_to_name[i] = line.replace("\n", "") # Class
     
-    predictions = list()
-    for txt_file in txt_files:
-        with open(txt_file) as f:
-            for line in f.readlines():
-                class_idx = int(line.split(" ")[4])
-                class_name = idx_to_name[class_idx]
-                predictions.append(class_name)
-    print(predictions)
+    #predictions = list()
+    with open(path_tp) as f:
+        lines = f.readlines()
+        tps = [int(line.replace("\n", "")) for line in lines]
+        predictions = [idx_to_name[tp] for tp in tps]
+    #for txt_file in txt_files:
+    #    with open(txt_file) as f:
+    #        for line in f.readlines():
+    #            class_idx = int(line.split(" ")[4])
+    #            class_name = idx_to_name[class_idx]
+    #            predictions.append(class_name)
+    #print(predictions)
     
     annotation_dir = opt.annot
     label_list = list()
