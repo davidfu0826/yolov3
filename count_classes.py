@@ -95,7 +95,7 @@ if __name__ == '__main__':
         #    predictions.remove(pred)
         #    false_positives.append(pred)
     
-    
+    print(f"{len(predictions)}/{len(label_list)+len(predictions)}")
     two_stacked_horizontal_histogram(predictions, label_list)      
     #plt.figure()
     #plt.title("Distribution of predictions")  
