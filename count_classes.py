@@ -52,14 +52,12 @@ def two_stacked_horizontal_histogram(
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Example usage: python count_classes.py --annot darknet_dataset\labels\ ")
     parser.add_argument('--true-positives', type=str, default='true_positives.txt', help='path to output file true_positives.txt (created from detect.py --save-txt)')  
-    parser.add_argument('--annot', type=str, help='path to annotation files directory (Darknet format)', required=True)
+    parser.add_argument('--data', type=str, help='path to data file (Darknet format)', required=True)
     parser.add_argument('--names', type=str, default='data/traffic_sign.names', help='*.names path')
     opt = parser.parse_args()
     
     path_tp = opt.true_positives
     names = opt.names
-    #txt_files = glob.glob(path_to_folder + "/*.txt")
-    #print(txt_files)
     
     idx_to_name = dict()
     with open(names) as f:
@@ -71,34 +69,20 @@ if __name__ == '__main__':
         lines = f.readlines()
         tps = [int(float(line.replace("\n", ""))) for line in lines]
         predictions = [idx_to_name[tp] for tp in tps]
-    #for txt_file in txt_files:
-    #    with open(txt_file) as f:
-    #        for line in f.readlines():
-    #            class_idx = int(line.split(" ")[4])
-    #            class_name = idx_to_name[class_idx]
-    #            predictions.append(class_name)
-    #print(predictions)
-    
-    annotation_dir = opt.annot
+
+    with open(opt.data) as f:
+        txt_metadata_path = f.readlines()[2].split("=")[1].replace("\n", "")
+        with open(txt_metadata_path) as f:
+            txt_paths = [path.replace("\n", "").replace(".jpg", ".txt").replace("/images/", "/labels/") for path in f.readlines()]
     label_list = list()
-    for annot_txt in glob.glob(annotation_dir + os.sep + "*.txt"):
+    for annot_txt in txt_paths:#glob.glob("test_set/labels/*/*.txt"):#glob.glob(annotation_dir + os.sep + "*.txt"):
         with open(annot_txt) as f:
             labels = [line.split(" ")[0] for line in f.readlines()]
             for label_id in labels:
                 label_list.append(idx_to_name[int(label_id)])
-    #label_list += predictions
-    #false_positives = list()
+
     for pred in predictions:
-        #try:
         label_list.remove(pred)
-        #except:
-        #    predictions.remove(pred)
-        #    false_positives.append(pred)
     
     print(f"{len(predictions)}/{len(label_list)+len(predictions)}")
     two_stacked_horizontal_histogram(predictions, label_list)      
-    #plt.figure()
-    #plt.title("Distribution of predictions")  
-    #sns.countplot(y=label_list)
-    #sns.countplot(y=predictions)
-    #plt.show()
