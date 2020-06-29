@@ -34,7 +34,7 @@ def test(cfg,
          weights=None,
          batch_size=16,
          img_size=416,
-         conf_thres=0.001,
+         conf_thres=0.01,
          iou_thres=0.6,  # for nms
          save_json=False,
          single_cls=False,
