@@ -12,10 +12,10 @@ import torch.nn.functional as F
 def init_seeds(seed=0):
     torch.manual_seed(seed)
 
-    # Remove randomness (may be slower on Tesla GPUs) # https://pytorch.org/docs/stable/notes/randomness.html
+    # Reduce randomness (may be slower on Tesla GPUs) # https://pytorch.org/docs/stable/notes/randomness.html
     if seed == 0:
-        cudnn.deterministic = True
-        cudnn.benchmark = False
+        cudnn.deterministic = False
+        cudnn.benchmark = True
 
 
 def select_device(device='', apex=False, batch_size=None):
@@ -107,7 +107,7 @@ def model_info(model, verbose=False):
 
     try:  # FLOPS
         from thop import profile
-        macs, _ = profile(model, inputs=(torch.zeros(1, 3, 480, 640),))
+        macs, _ = profile(model, inputs=(torch.zeros(1, 3, 480, 640),), verbose=False)
         fs = ', %.1f GFLOPS' % (macs / 1E9 * 2)
     except:
         fs = ''
