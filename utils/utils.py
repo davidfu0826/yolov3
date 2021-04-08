@@ -818,6 +818,14 @@ def output_to_target(output, width, height):
 
                 targets.append([i, cls, x, y, w, h, conf])
 
+    # Workaround for latest PyTorch 2021-04-01
+    """new_targets = targets.copy()
+    for i, target in enumerate(targets):
+        for j, t in enumerate(target):
+            if isinstance(t,int):
+                pass
+            else:
+                new_targets[i][j] = t.cpu()"""
     return np.array(targets)
 
 

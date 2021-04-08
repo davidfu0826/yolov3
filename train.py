@@ -10,6 +10,8 @@ from models import *
 from utils.datasets import *
 from utils.utils import *
 
+import wandb
+
 mixed_precision = True
 try:  # Mixed precision training https://github.com/NVIDIA/apex
     from apex import amp
@@ -41,6 +43,7 @@ hyp = {'giou': 3.54,  # giou loss gain
        'translate': 0.05,  # image translation (+/- fraction)
        'scale': 0.05,  # image scale (+/- gain)
        'shear': 0.641}  # image shear (+/- deg)
+
 
 # Overwrite hyp with hyp*.txt (optional)
 f = glob.glob('hyp*.txt')
@@ -89,6 +92,8 @@ def train(hyp):
 
     # Initialize model
     model = Darknet(cfg).to(device)
+    if WANDB:
+        wandb.watch(model)
 
     # Optimizer
     pg0, pg1, pg2 = [], [], []  # optimizer parameter groups
@@ -303,7 +308,7 @@ def train(hyp):
             mem = '%.3gG' % (torch.cuda.memory_cached() / 1E9 if torch.cuda.is_available() else 0)  # (GB)
             s = ('%10s' * 2 + '%10.3g' * 6) % ('%g/%g' % (epoch, epochs - 1), mem, *mloss, len(targets), img_size)
             pbar.set_description(s)
-
+            
             # Plot
             if ni < 1:
                 f = 'train_batch%g.jpg' % i  # filename
@@ -313,7 +318,7 @@ def train(hyp):
                     # tb_writer.add_graph(model, imgs)  # add model to tensorboard
 
             # end batch ------------------------------------------------------------------------------------------------
-
+        mloss
         # Update scheduler
         scheduler.step()
 
@@ -333,6 +338,23 @@ def train(hyp):
                                       multi_label=ni > n_burn)
 
         # Write
+        if WANDB:
+            test_results = {
+                "epoch":   epoch,
+                "gpu_mem": mem,
+                "GIoU"   : mloss[0],
+                "obj":     mloss[1],
+                "cls":     mloss[2],
+                "total":   mloss[3],
+                "P":       results[0],
+                "R":       results[1],
+                "mAP@0.5": results[2],
+                "F1":      results[3],
+                "targets": len(targets), 
+                "img_size":img_size
+            }
+            wandb.log(test_results)
+
         with open(results_file, 'a') as f:
             f.write(s + '%10.3g' * 7 % results + '\n')  # P, R, mAP, F1, test_losses=(GIoU, obj, cls)
         if len(opt.name) and opt.bucket:
@@ -423,6 +445,19 @@ if __name__ == '__main__':
 
     # scale hyp['obj'] by img_size (evolved at 320)
     # hyp['obj'] *= opt.img_size[0] / 320.
+
+    WANDB = True
+
+    if WANDB:
+        wandb.init(project='oresundsbron', entity='davidfu0826', resume=True)
+
+    # Save hyperparameter in wandb
+    if WANDB:
+        config = wandb.config
+        for key in hyp:
+            config[key] = hyp[key]
+        #config.learning_rate = 0.01
+
 
     tb_writer = None
     if not opt.evolve:  # Train normally
