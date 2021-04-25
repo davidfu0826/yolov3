@@ -39,10 +39,10 @@ hyp = {'giou': 3.54,  # giou loss gain
        'hsv_h': 0.0138,  # image HSV-Hue augmentation (fraction)
        'hsv_s': 0.678,  # image HSV-Saturation augmentation (fraction)
        'hsv_v': 0.36,  # image HSV-Value augmentation (fraction)
-       'degrees': 1.98,  # image rotation (+/- deg)
-       'translate': 0.05,  # image translation (+/- fraction)
-       'scale': 0.05,  # image scale (+/- gain)
-       'shear': 0.641}  # image shear (+/- deg)
+       'degrees': 1.98 * 0,  # image rotation (+/- deg)
+       'translate': 0.05 * 0,  # image translation (+/- fraction)
+       'scale': 0.05 * 0,  # image scale (+/- gain)
+       'shear': 0.641 * 0}  # image shear (+/- deg)
 
 
 # Overwrite hyp with hyp*.txt (optional)
@@ -318,7 +318,7 @@ def train(hyp):
                     # tb_writer.add_graph(model, imgs)  # add model to tensorboard
 
             # end batch ------------------------------------------------------------------------------------------------
-        mloss
+        
         # Update scheduler
         scheduler.step()
 
@@ -446,7 +446,7 @@ if __name__ == '__main__':
     # scale hyp['obj'] by img_size (evolved at 320)
     # hyp['obj'] *= opt.img_size[0] / 320.
 
-    WANDB = True
+    WANDB = False
 
     if WANDB:
         wandb.init(project='oresundsbron', entity='davidfu0826', resume=True)
